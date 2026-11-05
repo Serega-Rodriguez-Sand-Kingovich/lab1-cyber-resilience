@@ -84,7 +84,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python scripts/data_gate.py --report reports/ci/data_gate.json
+          python -c 'import pandas as pd; df = pd.read_csv("data/digits.csv"); df.drop(columns=["pixel_0_0"]).to_csv("/tmp/lab3_invalid_schema.csv", index=False)'
+          python scripts/data_gate.py --data /tmp/lab3_invalid_schema.csv --report reports/ci/data_gate.json
 
       - name: "10 - Model quality gate (mandatory)"
         shell: bash
