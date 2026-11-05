@@ -6,6 +6,7 @@ asttokens==3.0.2
 async-lru==2.4.0
 attrs==26.1.0
 babel==2.18.0
+bandit==1.9.4
 beautifulsoup4==4.15.0
 bleach==6.4.0
 boolean.py==5.0
@@ -108,6 +109,7 @@ six==1.17.0
 sortedcontainers==2.4.0
 soupsieve==3.0.4
 stack-data==0.6.3
+stevedore==5.9.1
 terminado==0.18.1
 threadpoolctl==3.7.0
 tinycss2==1.5.1

@@ -1,0 +1,29 @@
+{
+  "algorithm": "scikit-learn Pipeline(StandardScaler, LogisticRegression)",
+  "scaler": "StandardScaler; parameters fitted only on X_train",
+  "classifier": "LogisticRegression",
+  "classifier_settings": {
+    "C": 1.0,
+    "solver": "lbfgs",
+    "max_iter": 2000,
+    "random_state": 42
+  },
+  "validation_strategy": "No tuning; fixed configuration and one stratified train/test split",
+  "reference": "DummyClassifier(strategy=most_frequent)",
+  "data_version": "4b55658bf1299c5e4bdce02ae154081e2694f74e22eca2c5bc8b7a5c8d67419e",
+  "split_seed": 42,
+  "test_fraction": 0.2,
+  "fit_seconds": 1.0185777699998653,
+  "model_path": "models/digits_baseline.joblib",
+  "model_sha256": "655ada9ced68462b56dc298ad18bba5e2c2b4fe9783181aef8067ffd3467c9a9",
+  "training_utc": "2026-11-04T23:32:01.073579+00:00",
+  "versions": {
+    "python": "3.12.3",
+    "numpy": "2.5.4",
+    "pandas": "3.1.0",
+    "scikit_learn": "1.9.1",
+    "joblib": "1.6.0",
+    "matplotlib": "3.11.2"
+  },
+  "security_note": "joblib is pickle-based; load only the project-owned artifact after verification against an independently trusted checksum."
+}

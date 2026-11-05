@@ -1,0 +1,5 @@
+Lab 1 data checksums OK
+Lab 2 model checksum OK
+Model path: /home/mluser/ml-project/models/digits_baseline.joblib
+Model can be reloaded; first input: label=0, prediction=0
+Saved held-out accuracy: 0.9741

@@ -1,0 +1,10 @@
+PASS missing_required_field: InputValidationError: Request requires exactly one field: 'pixels'
+PASS wrong_numeric_type: InputValidationError: Pixel data must be numeric, not string/object
+PASS wrong_image_size: InputValidationError: Expected image shape 8x8 or batch N x 8x8 / N x 64
+PASS empty_input: InputValidationError: Empty input is not accepted
+PASS nan: InputValidationError: NaN and Inf are forbidden
+PASS inf: InputValidationError: NaN and Inf are forbidden
+PASS batch_limit_33: InputValidationError: Input exceeds the maximum allowed size
+PASS pixel_outside_0_to_16: InputValidationError: Pixel intensity must be between 0 and 16
+PASS unsupported_binary_file: InputValidationError: Input must be a NumPy array or numeric list
+PASS positive_valid_8_by_8: Предсказан класс 4

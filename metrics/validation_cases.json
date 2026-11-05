@@ -1,0 +1,97 @@
+{
+  "count": 10,
+  "passed": 10,
+  "failed": 0,
+  "cases": [
+    {
+      "case": "missing_required_field",
+      "input_description": "Отсутствует обязательное поле pixels",
+      "expected": "Контролируемый InputValidationError, 0 вызовов модели",
+      "actual": "InputValidationError: Request requires exactly one field: 'pixels'",
+      "model_calls": 0,
+      "passed": true,
+      "conclusion": "Проверка успешна: вход отклонён до модели"
+    },
+    {
+      "case": "wrong_numeric_type",
+      "input_description": "Строка abc вместо значения пикселя",
+      "expected": "Контролируемый InputValidationError, 0 вызовов модели",
+      "actual": "InputValidationError: Pixel data must be numeric, not string/object",
+      "model_calls": 0,
+      "passed": true,
+      "conclusion": "Проверка успешна: вход отклонён до модели"
+    },
+    {
+      "case": "wrong_image_size",
+      "input_description": "Неверная форма изображения 7x8",
+      "expected": "Контролируемый InputValidationError, 0 вызовов модели",
+      "actual": "InputValidationError: Expected image shape 8x8 or batch N x 8x8 / N x 64",
+      "model_calls": 0,
+      "passed": true,
+      "conclusion": "Проверка успешна: вход отклонён до модели"
+    },
+    {
+      "case": "empty_input",
+      "input_description": "Пустой список пикселей",
+      "expected": "Контролируемый InputValidationError, 0 вызовов модели",
+      "actual": "InputValidationError: Empty input is not accepted",
+      "model_calls": 0,
+      "passed": true,
+      "conclusion": "Проверка успешна: вход отклонён до модели"
+    },
+    {
+      "case": "nan",
+      "input_description": "Изображение с NaN",
+      "expected": "Контролируемый InputValidationError, 0 вызовов модели",
+      "actual": "InputValidationError: NaN and Inf are forbidden",
+      "model_calls": 0,
+      "passed": true,
+      "conclusion": "Проверка успешна: вход отклонён до модели"
+    },
+    {
+      "case": "inf",
+      "input_description": "Изображение с Inf",
+      "expected": "Контролируемый InputValidationError, 0 вызовов модели",
+      "actual": "InputValidationError: NaN and Inf are forbidden",
+      "model_calls": 0,
+      "passed": true,
+      "conclusion": "Проверка успешна: вход отклонён до модели"
+    },
+    {
+      "case": "batch_limit_33",
+      "input_description": "Пакет из 33 изображений при максимуме 32",
+      "expected": "Контролируемый InputValidationError, 0 вызовов модели",
+      "actual": "InputValidationError: Input exceeds the maximum allowed size",
+      "model_calls": 0,
+      "passed": true,
+      "conclusion": "Проверка успешна: вход отклонён до модели"
+    },
+    {
+      "case": "pixel_outside_0_to_16",
+      "input_description": "Пиксели со значениями 16.1 вне диапазона",
+      "expected": "Контролируемый InputValidationError, 0 вызовов модели",
+      "actual": "InputValidationError: Pixel intensity must be between 0 and 16",
+      "model_calls": 0,
+      "passed": true,
+      "conclusion": "Проверка успешна: вход отклонён до модели"
+    },
+    {
+      "case": "unsupported_binary_file",
+      "input_description": "Бинарные байты вместо декодированного массива",
+      "expected": "Контролируемый InputValidationError, 0 вызовов модели",
+      "actual": "InputValidationError: Input must be a NumPy array or numeric list",
+      "model_calls": 0,
+      "passed": true,
+      "conclusion": "Проверка успешна: вход отклонён до модели"
+    },
+    {
+      "case": "positive_valid_8_by_8",
+      "input_description": "Корректный числовой массив 8x8 из нулей",
+      "expected": "Один прогноз класса 0–9",
+      "actual": "Предсказан класс 4",
+      "model_calls": 1,
+      "passed": true,
+      "conclusion": "Положительный тест успешен"
+    }
+  ]
+}

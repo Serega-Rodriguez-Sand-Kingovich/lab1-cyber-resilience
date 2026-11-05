@@ -6,3 +6,6 @@ __pycache__/
 *.pyc
 models/*.pkl
 models/*.joblib
+
+# Приватная сдача артефакта модели из ЛР №2
+lab2_model_private.zip

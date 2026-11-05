@@ -1,0 +1,6 @@
+Lab 2 robustness experiment complete
+clean: accuracy=0.850; changed=0/20
+noise: accuracy=0.850; changed=2/20
+brightness: accuracy=0.900; changed=3/20
+Atypical input: predicted=4; neighbor-distance=91.66
+Typical held-out nearest-neighbor 95th percentile=24.08

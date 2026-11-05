@@ -1,0 +1,28 @@
+=== Пользователь и рабочее окружение ===
+uid=1001(mluser) gid=1001(mluser) groups=1001(mluser),27(sudo),100(users)
+Python 3.12.3
+=== Права на данные, модель и каталог модели ===
+600 mluser:mluser data/digits.csv
+600 mluser:mluser data/digits_original.csv
+700 mluser:mluser models
+600 mluser:mluser models/digits_baseline.joblib
+=== Результирующая серверная политика OpenSSH (без ключей) ===
+permitrootlogin no
+pubkeyauthentication yes
+passwordauthentication no
+kbdinteractiveauthentication no
+=== Настройки UFW ===
+Status: active
+Logging: on (high)
+Default: deny (incoming), allow (outgoing), deny (routed)
+New profiles: skip
+
+To                         Action      From
+--                         ------      ----
+22/tcp                     LIMIT IN    Anywhere
+22/tcp (v6)                LIMIT IN    Anywhere (v6)
+
+=== Проверка прослушивания Jupyter (без доступа к токену) ===
+LISTEN 0      128        127.0.0.1:8888       0.0.0.0:*
+=== Приватная модель не должна попадать в публичный Git ===
+models/digits_baseline.joblib

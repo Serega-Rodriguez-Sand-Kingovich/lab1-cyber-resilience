@@ -1,0 +1,71 @@
+{
+  "data_version": "4b55658bf1299c5e4bdce02ae154081e2694f74e22eca2c5bc8b7a5c8d67419e",
+  "n_examples": 20,
+  "selected_test_indices": [
+    14,
+    54,
+    232,
+    235,
+    412,
+    373,
+    607,
+    573,
+    758,
+    780,
+    939,
+    1032,
+    1070,
+    1173,
+    1347,
+    1373,
+    1463,
+    1401,
+    1734,
+    1665
+  ],
+  "selection": "Two random examples per class from held-out test, seed 2026",
+  "noise": {
+    "type": "independent Gaussian pixel noise",
+    "sigma": 0.8,
+    "clipped_range": [
+      0,
+      16
+    ]
+  },
+  "brightness": {
+    "type": "constant pixel shift",
+    "offset": 0.6,
+    "clipped_range": [
+      0,
+      16
+    ]
+  },
+  "variants": {
+    "clean": {
+      "accuracy": 0.85,
+      "changed_fraction": 0.0,
+      "changed_count": 0
+    },
+    "noise": {
+      "accuracy": 0.85,
+      "changed_fraction": 0.1,
+      "changed_count": 2
+    },
+    "brightness": {
+      "accuracy": 0.9,
+      "changed_fraction": 0.15,
+      "changed_count": 3
+    }
+  },
+  "atypical_example": {
+    "description": "A fully bright 8x8 matrix; syntactically valid but unlike handwritten digits",
+    "prediction": 4,
+    "distance_to_nearest_training_example_l2": 91.65696918401787,
+    "test_nearest_neighbor_distance_p95_l2": 24.08213272727205,
+    "exceeds_typical_test_p95": true,
+    "response": "Accepted by shape/range checks; model still returns a digit (no rejection option).",
+    "caution": "This is evidence of atypicality for this dataset, not a universal OOD detector."
+  },
+  "interpretation": "20 examples are insufficient to claim general robustness. Small perturbations may flip labels even when each pixel remains within the allowed range. Shape validation cannot detect atypical but numerically valid pictures.",
+  "proposed_defense": "Investigate calibrated abstention or distance-based anomaly screening on a separate validation set."
+}

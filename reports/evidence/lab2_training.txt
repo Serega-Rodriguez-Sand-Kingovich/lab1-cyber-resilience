@@ -1,0 +1,9 @@
+Lab 2 training complete
+Training: 1392, test: 348, classes: 10
+Data SHA256: 4b55658bf1299c5e4bdce02ae154081e2694f74e22eca2c5bc8b7a5c8d67419e
+Model SHA256: 655ada9ced68462b56dc298ad18bba5e2c2b4fe9783181aef8067ffd3467c9a9
+Accuracy=0.9741; macro F1=0.9740
+Majority baseline accuracy=0.0977
+Training seconds=0.777
+Figures saved: 4
+Metrics file: /home/mluser/ml-project/metrics/baseline.json
