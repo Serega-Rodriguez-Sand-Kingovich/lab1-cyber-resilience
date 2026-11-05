@@ -108,3 +108,30 @@ trivy config --exit-code 1 Dockerfile
 Источники:
 - https://bugs.debian.org/1152790
 - https://security-tracker.debian.org/tracker/source-package/sqlite3
+
+## Подтверждение работы CI/CD на GitHub
+
+Работоспособность конвейера CI/CD подтверждена четырьмя
+запусками GitHub Actions.
+
+| Эксперимент | Результат | GitHub Actions |
+|---|---|---|
+| Первоначальная проверка безопасности образа | Блокировка Security Gate | [Запуск № 1](https://github.com/Serega-Rodriguez-Sand-Kingovich/lab1-cyber-resilience/actions/runs/4204250573) |
+| Проверка исправленного проекта | Успешно пройдены все 19 этапов | [Запуск № 2](https://github.com/Serega-Rodriguez-Sand-Kingovich/lab1-cyber-resilience/actions/runs/42059500317) |
+| Проверка данных с нарушенной схемой | Блокировка Data Gate на этапе 09 | [Запуск № 3](https://github.com/Serega-Rodriguez-Sand-Kingovich/lab1-cyber-resilience/actions/runs/42062240120) |
+| Проверка модели с недостаточной точностью | Блокировка Model Gate на этапе 10 | [Запуск № 4](https://github.com/Serega-Rodriguez-Sand-Kingovich/lab1-cyber-resilience/actions/runs/42062928574) |
+
+В первоначальном запуске Security Gate обнаружил
+уязвимости системной библиотеки SQLite. После устранения
+проблемы и документирования ограниченных исключений
+исправленный проект успешно прошёл конвейер CI/CD.
+
+В отдельных демонстрационных ветках проведены испытания
+защитных механизмов. Data Gate отклонил набор данных
+без обязательного признака pixel_0_0. Model Gate отклонил
+слабую модель с точностью 10,06 % при минимально
+допустимом значении 92,54 %.
+
+Результаты подтверждают, что проверки предотвращают
+продолжение конвейера при нарушении требований
+к данным, качеству модели и безопасности.
