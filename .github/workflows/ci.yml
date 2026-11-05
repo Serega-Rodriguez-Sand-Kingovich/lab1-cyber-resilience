@@ -90,7 +90,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python scripts/model_gate.py --report reports/ci/model_gate.json
+          python scripts/model_gate.py --demo-weak-candidate --report reports/ci/model_gate.json
 
       - name: "11 - Build offline non-root model image"
         shell: bash
