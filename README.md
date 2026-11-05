@@ -9,6 +9,7 @@
 |:--|:--|:--|
 | **№ 1** | Подготовка защищённого окружения и исследование набора рукописных цифр | Описание **ниже на этой странице**, [ноутбук № 1](notebooks/01_digits_analysis.ipynb), [графики](reports/figures/) |
 | **№ 2** | Построение базовой модели, оценка качества и проверка устойчивости входов | **[Описание, результаты и 7 рисунков](README_LAB2.md)**, [ноутбук № 2](notebooks/02_baseline_and_robustness.ipynb), [метрики](metrics/baseline.json), [тесты](tests/) |
+| № 3 | Тестирование Python-кода и безопасный CI/CD | [Описание и результаты](README_LAB3_CI.md), [Jupyter-ноутбук](notebooks/03_lab3_secure_cicd.ipynb), [GitHub Actions](.github/workflows/ci.yml) |
 
 ## Основные результаты второго этапа
 

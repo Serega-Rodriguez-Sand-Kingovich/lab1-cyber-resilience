@@ -1,0 +1,168 @@
+name: "Lab 3 - secure ML CI"
+
+on:
+  push:
+    branches:
+      - main
+      - lab3-ci
+      - "demo/**"
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quality-security-docker:
+    name: "Tests -> gates -> Docker -> Trivy -> smoke"
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+    steps:
+      - name: "01 - Checkout sources without persisted credentials"
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: "02 - Python 3.12"
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+          check-latest: false
+
+      - name: "03 - Prepare CI reports and provenance"
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p reports/ci
+          echo "${GITHUB_SHA}" > reports/ci/commit.txt
+          date -u +'%Y-%m-%dT%H:%M:%SZ' > reports/ci/scan_started_utc.txt
+          python --version > reports/ci/python_version.txt
+          sha256sum data/digits.csv models/digits_baseline.joblib > reports/ci/input_sha256.txt
+          sha256sum -c integrity/datasets.sha256
+
+      - name: "04 - Install locked runtime and CI tools"
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements-runtime.txt -r requirements-ci.txt
+          python -m pip check
+          python -m pip freeze > reports/ci/installed_packages.txt
+
+      - name: "05 - Ruff lint (mandatory)"
+        shell: bash
+        run: |
+          set -euo pipefail
+          ruff check src/ tests/ scripts/data_gate.py scripts/model_gate.py scripts/docker_smoke.py scripts/export_runtime_requirements.py scripts/security_gate.py --output-format json > reports/ci/ruff.json
+          ruff --version > reports/ci/ruff_version.txt
+
+      - name: "06 - Bandit security analysis (mandatory)"
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m bandit -r src/ -f json -o reports/ci/bandit.json
+
+      - name: "07 - Pytest unit and integration tests (mandatory)"
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pytest tests/ -q --junitxml=reports/ci/pytest.xml
+
+      - name: "08 - pip-audit runtime dependencies (mandatory)"
+        shell: bash
+        run: |
+          set -euo pipefail
+          pip-audit -r requirements-runtime.txt --format json --output reports/ci/pip_audit_runtime.json
+
+      - name: "09 - Data quality gate (mandatory)"
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/data_gate.py --report reports/ci/data_gate.json
+
+      - name: "10 - Model quality gate (mandatory)"
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/model_gate.py --report reports/ci/model_gate.json
+
+      - name: "11 - Build offline non-root model image"
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker build --pull -t ml-project:lab3 . > reports/ci/docker_build.log 2>&1 || { cat reports/ci/docker_build.log; exit 1; }
+          docker image inspect ml-project:lab3 --format '{{json .Config.Healthcheck}}' > reports/ci/docker_healthcheck.json
+          docker image inspect ml-project:lab3 --format '{{.Id}}' > reports/ci/docker_image_id.txt
+
+      - name: "12 - Install verified Trivy v0.76.1"
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION=0.76.1
+          cd /tmp
+          curl -fsSL --retry 3 -o trivy_0.76.1_checksums.txt "https://github.com/aquasecurity/trivy/releases/download/v${VERSION}/trivy_0.76.1_checksums.txt"
+          printf '%s  %s\n' '885debc41b570179e81af560e5f393a66be29b9ff8c52915674f3eb2304c535d' trivy_0.76.1_checksums.txt | sha256sum -c -
+          curl -fsSL --retry 3 -o trivy_0.76.1_Linux-64bit.deb "https://github.com/aquasecurity/trivy/releases/download/v${VERSION}/trivy_0.76.1_Linux-64bit.deb"
+          EXPECTED=$(awk '$2 == "trivy_0.76.1_Linux-64bit.deb" || $2 == "*trivy_0.76.1_Linux-64bit.deb" {print $1}' trivy_0.76.1_checksums.txt)
+          test -n "$EXPECTED"
+          printf '%s  %s\n' "$EXPECTED" trivy_0.76.1_Linux-64bit.deb | sha256sum -c -
+          sudo dpkg -i trivy_0.76.1_Linux-64bit.deb
+          cd "$GITHUB_WORKSPACE"
+          trivy --version > reports/ci/trivy_version.txt
+
+      - name: "13 - Real Trivy image scan (mandatory; errors block)"
+        shell: bash
+        run: |
+          set -euo pipefail
+          trivy image --image-src docker --scanners vuln --format json --no-progress --output reports/ci/trivy_image.json ml-project:lab3
+
+      - name: "14 - Image security gate: CRITICAL/UNKNOWN (mandatory)"
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/security_gate.py --report reports/ci/trivy_image.json --output reports/ci/security_gate.json
+
+      - name: "15 - Safe fixture security gate (mandatory, for failure demo)"
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/security_gate.py --report tests/fixtures/security_gate_input.json --output reports/ci/security_fixture_gate.json
+
+      - name: "16 - Trivy Dockerfile configuration gate (mandatory)"
+        shell: bash
+        run: |
+          set -euo pipefail
+          trivy config --exit-code 1 --format json --output reports/ci/trivy_dockerfile.json Dockerfile
+
+      - name: "17 - Verify non-root and restricted offline prediction (mandatory)"
+        shell: bash
+        run: |
+          set -euo pipefail
+          ACTUAL_UID=$(docker run --rm --entrypoint id ml-project:lab3 -u)
+          echo "${ACTUAL_UID}" > reports/ci/container_uid.txt
+          test "$ACTUAL_UID" = "10001"
+          docker run --rm --read-only --network none --cap-drop ALL --security-opt no-new-privileges --pids-limit 64 ml-project:lab3 | tee reports/ci/docker_smoke.txt
+          grep -q 'SMOKE PASS:' reports/ci/docker_smoke.txt
+
+      - name: "18 - Record final run metadata (even after failure)"
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p reports/ci
+          date -u +'%Y-%m-%dT%H:%M:%SZ' > reports/ci/scan_finished_utc.txt
+          printf 'repository=%s\ncommit=%s\nref=%s\nrun_id=%s\n' "$GITHUB_REPOSITORY" "$GITHUB_SHA" "$GITHUB_REF" "$GITHUB_RUN_ID" > reports/ci/run_metadata.txt
+
+      - name: "19 - Upload all available diagnostic evidence (even after failure)"
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: "lab3-ci-evidence-${{ github.run_id }}"
+          path: reports/ci/
+          if-no-files-found: warn
+          retention-days: 30

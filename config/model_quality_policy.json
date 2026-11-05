@@ -1,0 +1,13 @@
+{
+  "policy_version": "lab3-v1",
+  "metric_name": "accuracy",
+  "max_relative_drop": 0.05,
+  "baseline_path": "metrics/baseline.json",
+  "dataset_path": "data/digits.csv",
+  "dataset_sha256": "4b55658bf1299c5e4bdce02ae154081e2694f74e22eca2c5bc8b7a5c8d67419e",
+  "model_path": "models/digits_baseline.joblib",
+  "test_size": 0.2,
+  "random_state": 42,
+  "expected_test_rows": 348,
+  "predict_batch_size": 32
+}

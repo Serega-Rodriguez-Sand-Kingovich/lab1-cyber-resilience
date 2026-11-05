@@ -2,7 +2,12 @@
 import numpy as np
 import pytest
 
-from src.inference import InputValidationError, predict_digits, predict_request, validate_digits
+from src.inference import (
+    InputValidationError,
+    predict_digits,
+    predict_request,
+    validate_digits,
+)
 
 
 class SpyModel:

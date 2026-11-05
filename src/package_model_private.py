@@ -6,7 +6,6 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile
 
 from .config import METRICS_DIR, MODEL_MANIFEST, MODEL_PATH, ROOT

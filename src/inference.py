@@ -39,7 +39,7 @@ def _shape_of_list(obj: Any, depth: int = 0) -> tuple[int, ...]:
         return (n,) + child_shape
     if isinstance(obj, (bool, np.bool_)) or not isinstance(obj, (int, float, np.number)):
         raise InputValidationError("Pixel data must be numeric, not string/object")
-    if isinstance(obj, complex) or isinstance(obj, np.complexfloating):
+    if isinstance(obj, (complex, np.complexfloating)):
         raise InputValidationError("Complex pixel values are not supported")
     return ()
 
@@ -68,9 +68,7 @@ def validate_digits(raw: Any, max_batch_size: int = MAX_BATCH) -> np.ndarray:
     if array.dtype.kind not in "iuf":
         raise InputValidationError("Pixel values must have a real numeric dtype")
 
-    if array.ndim == 1 and array.shape == (64,):
-        batch = array.reshape(1, 64)
-    elif array.ndim == 2 and array.shape == (8, 8):
+    if array.ndim == 1 and array.shape == (64,) or array.ndim == 2 and array.shape == (8, 8):
         batch = array.reshape(1, 64)
     elif array.ndim == 2 and array.shape[1] == 64:
         batch = array

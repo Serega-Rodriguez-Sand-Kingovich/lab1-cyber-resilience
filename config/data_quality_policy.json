@@ -1,0 +1,17 @@
+{
+  "dataset_name": "sklearn_digits_balanced_lab1",
+  "dataset_version": "lab1-balanced-2026",
+  "dataset_path": "data/digits.csv",
+  "sha256": "4b55658bf1299c5e4bdce02ae154081e2694f74e22eca2c5bc8b7a5c8d67419e",
+  "image_height": 8,
+  "image_width": 8,
+  "label_column": "target",
+  "labels": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+  "min_rows": 1740,
+  "max_rows": 1740,
+  "min_per_class": 174,
+  "max_per_class": 174,
+  "min_pixel": 0,
+  "max_pixel": 16,
+  "max_file_bytes": 1048576
+}

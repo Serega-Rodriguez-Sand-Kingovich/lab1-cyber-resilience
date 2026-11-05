@@ -15,8 +15,16 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 
 from .config import (
-    CLASSES, DATA_MANIFEST, DATA_PATH, EXPECTED_DATA_HASHES,
-    FEATURE_COLUMNS, LABEL_COLUMN, ORIGINAL_PATH, ROOT, SEED, TEST_SIZE,
+    CLASSES,
+    DATA_MANIFEST,
+    DATA_PATH,
+    EXPECTED_DATA_HASHES,
+    FEATURE_COLUMNS,
+    LABEL_COLUMN,
+    ORIGINAL_PATH,
+    ROOT,
+    SEED,
+    TEST_SIZE,
 )
 
 
@@ -129,8 +137,8 @@ def load_and_check_data() -> tuple[np.ndarray, np.ndarray, dict]:
     summary = {
         "data_version": hashes["data/digits.csv"],
         "original_version": hashes["data/digits_original.csv"],
-        "rows_original": int(len(original)),
-        "rows_balanced": int(len(frame)),
+        "rows_original": len(original),
+        "rows_balanced": len(frame),
         "rows_removed_in_lab1": int(len(original) - len(frame)),
         "original_class_counts": {str(k): int(v) for k, v in zip(unique_orig_labels, unique_orig_counts)},
         "original_missing_total": original_missing,
