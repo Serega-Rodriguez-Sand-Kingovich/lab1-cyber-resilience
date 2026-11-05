@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "package": "libsqlite3-0",
+  "installed_version": "3.54.1-2",
+  "severity": "UNKNOWN",
+  "cve_ids": [
+    "CVE-2026-119371",
+    "CVE-2026-119372",
+    "CVE-2026-119374",
+    "CVE-2026-119375",
+    "CVE-2026-119376",
+    "CVE-2026-119379"
+  ],
+  "expires_on": "2026-12-05",
+  "source_url": "https://bugs.debian.org/1152790",
+  "reason": "Debian sqlite3 3.54.1-1 fixed these six CVEs; the image contains 3.54.1-2 from Debian sid. Trivy labels them UNKNOWN using Debian 13 tracking; raw findings remain in trivy_image.json. Reassess before expiry."
+}

@@ -126,7 +126,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python scripts/security_gate.py --report reports/ci/trivy_image.json --output reports/ci/security_gate.json
+          python scripts/security_gate.py --report reports/ci/trivy_image.json --output reports/ci/security_gate.json --exception-policy config/sqlite_exception_policy.json
 
       - name: "15 - Safe fixture security gate (mandatory, for failure demo)"
         shell: bash
