@@ -1,0 +1,12 @@
+{
+  "SchemaVersion": 2,
+  "ArtifactName": "SIMULATED_FIXTURE_NOT_A_REAL_IMAGE_SCAN",
+  "Results": [
+    {
+      "Target": "SIMULATED_CLEAN_FIXTURE",
+      "Class": "os-pkgs",
+      "Type": "debian",
+      "Vulnerabilities": null
+    }
+  ]
+}

@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import platform
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import joblib
 import matplotlib
@@ -17,19 +17,31 @@ import sklearn
 from sklearn.dummy import DummyClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (
-    accuracy_score, classification_report, confusion_matrix, f1_score,
-    precision_score, recall_score,
+    accuracy_score,
+    classification_report,
+    confusion_matrix,
+    f1_score,
+    precision_score,
+    recall_score,
 )
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
 from .config import (
-    CLASSES, FIGURES_DIR, METRICS_DIR, MODEL_MANIFEST, MODEL_PATH,
-    ROOT, SEED, TEST_SIZE,
+    CLASSES,
+    FIGURES_DIR,
+    METRICS_DIR,
+    MODEL_MANIFEST,
+    MODEL_PATH,
+    SEED,
+    TEST_SIZE,
 )
 from .data import load_and_check_data, save_json, sha256_file, split_data
 from .figures import (
-    plot_class_f1, plot_class_split, plot_confusion, plot_wrong_predictions,
+    plot_class_f1,
+    plot_class_split,
+    plot_confusion,
+    plot_wrong_predictions,
 )
 from .inference import load_verified_model, predict_digits
 
@@ -56,8 +68,8 @@ def run_training() -> dict:
         "random_state": SEED,
         "test_size_fraction": TEST_SIZE,
         "method": "train_test_split(stratify=y)",
-        "n_train": int(len(train_idx)),
-        "n_test": int(len(test_idx)),
+        "n_train": len(train_idx),
+        "n_test": len(test_idx),
         "train_indices": train_idx.tolist(),
         "test_indices": test_idx.tolist(),
         "train_class_counts": {str(k): int(v) for k, v in zip(*np.unique(y_train, return_counts=True))},
@@ -114,7 +126,7 @@ def run_training() -> dict:
         "fit_seconds": fit_seconds,
         "model_path": "models/digits_baseline.joblib",
         "model_sha256": model_sha256,
-        "training_utc": datetime.now(timezone.utc).isoformat(),
+        "training_utc": datetime.now(UTC).isoformat(),
         "versions": {
             "python": platform.python_version(),
             "numpy": np.__version__,
@@ -132,8 +144,8 @@ def run_training() -> dict:
         "primary_metric_value": float(accuracy_score(y_test, predictions)),
         "data_version": data_summary["data_version"],
         "model_sha256": model_sha256,
-        "n_train": int(len(y_train)),
-        "n_test": int(len(y_test)),
+        "n_train": len(y_train),
+        "n_test": len(y_test),
         "accuracy": float(accuracy_score(y_test, predictions)),
         "precision_macro": float(precision_score(y_test, predictions, average="macro", zero_division=0)),
         "recall_macro": float(recall_score(y_test, predictions, average="macro", zero_division=0)),

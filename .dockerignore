@@ -1,0 +1,27 @@
+# Allowlist: only build-required paths enter the Docker build context.
+**
+!Dockerfile
+!requirements-runtime.txt
+!src/
+!src/__init__.py
+!src/config.py
+!src/inference.py
+!src/data.py
+!scripts/
+!scripts/docker_smoke.py
+!models/
+!models/digits_baseline.joblib
+!metrics/
+!metrics/baseline.json
+
+# Defense in depth: secrets and caches are never context inputs.
+.git
+.venv
+**/.env
+**/.env.*
+**/*.key
+**/*_key
+**/*private_key*
+**/__pycache__
+**/*.pyc
+**/.ipynb_checkpoints

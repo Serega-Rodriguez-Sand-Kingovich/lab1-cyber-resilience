@@ -5,7 +5,7 @@ import json
 import numpy as np
 import pytest
 
-from src.config import METRICS_DIR, MODEL_MANIFEST, MODEL_PATH
+from src.config import METRICS_DIR, MODEL_PATH
 from src.data import load_and_check_data, sha256_file, split_data
 from src.inference import load_verified_model, predict_digits
 
@@ -66,7 +66,7 @@ def test_manifest_does_not_accept_path_traversal(tmp_path):
 
 def test_pipeline_scaler_matches_training_data_only():
     X, y, _ = load_and_check_data()
-    train_idx, test_idx = split_data(X, y)
+    train_idx, _test_idx = split_data(X, y)
     model = load_verified_model()
     scaler = model.named_steps["scaler"]
     assert np.allclose(scaler.mean_, X[train_idx].mean(axis=0), atol=1e-12)

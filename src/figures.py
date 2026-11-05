@@ -4,6 +4,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
@@ -28,7 +29,7 @@ def plot_class_split(y_train: np.ndarray, y_test: np.ndarray) -> Path:
     positions = np.arange(10)
     train_counts = np.bincount(y_train, minlength=10)
     test_counts = np.bincount(y_test, minlength=10)
-    fig, ax = plt.subplots(figsize=(9, 4.4))
+    _fig, ax = plt.subplots(figsize=(9, 4.4))
     ax.bar(positions - 0.18, train_counts, 0.36, label="Обучение")
     ax.bar(positions + 0.18, test_counts, 0.36, label="Тест")
     ax.set_xticks(positions)
@@ -42,7 +43,7 @@ def plot_class_split(y_train: np.ndarray, y_test: np.ndarray) -> Path:
 
 def plot_confusion(y_true: np.ndarray, y_pred: np.ndarray) -> Path:
     cm = confusion_matrix(y_true, y_pred, labels=CLASSES)
-    fig, ax = plt.subplots(figsize=(7.4, 6.9))
+    _fig, ax = plt.subplots(figsize=(7.4, 6.9))
     ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=CLASSES).plot(
         ax=ax, cmap="Blues", colorbar=True, values_format="d"
     )
@@ -54,7 +55,7 @@ def plot_confusion(y_true: np.ndarray, y_pred: np.ndarray) -> Path:
 
 def plot_class_f1(report: dict) -> Path:
     f1 = [report[str(i)]["f1-score"] for i in CLASSES]
-    fig, ax = plt.subplots(figsize=(8.5, 4.1))
+    _fig, ax = plt.subplots(figsize=(8.5, 4.1))
     bars = ax.bar(range(10), f1, color="steelblue")
     ax.bar_label(bars, labels=[f"{v:.2f}" for v in f1], padding=3, fontsize=9)
     ax.set_xticks(range(10))
@@ -105,7 +106,7 @@ def plot_robustness(robustness: dict) -> Path:
     accuracy = [robustness["variants"][v]["accuracy"] for v in ("clean", "noise", "brightness")]
     changes = [robustness["variants"][v]["changed_fraction"] for v in ("clean", "noise", "brightness")]
     idx = np.arange(len(variants))
-    fig, ax = plt.subplots(figsize=(8.2, 4.8))
+    _fig, ax = plt.subplots(figsize=(8.2, 4.8))
     ax.bar(idx - 0.18, accuracy, 0.36, label="Точность на тех же 20 примерах")
     ax.bar(idx + 0.18, changes, 0.36, label="Доля изменившихся ответов")
     ax.set_xticks(idx, variants)
@@ -118,7 +119,7 @@ def plot_robustness(robustness: dict) -> Path:
 
 
 def plot_atypical(atypical: np.ndarray, typical: np.ndarray, predicted_class: int) -> Path:
-    fig, axes = plt.subplots(1, 2, figsize=(6.8, 3.6))
+    _fig, axes = plt.subplots(1, 2, figsize=(6.8, 3.6))
     axes[0].imshow(typical.reshape(8, 8), cmap="gray_r", vmin=0, vmax=16)
     axes[0].set_title("Типичная тестовая цифра")
     axes[1].imshow(atypical.reshape(8, 8), cmap="gray_r", vmin=0, vmax=16)
