@@ -1,20 +1,20 @@
-name: "Lab 3 - secure ML CI"
+name: "Lab 4 - secure ML API and CI"
 
 on:
   push:
     branches:
       - main
       - lab3-ci
+      - lab4-api
       - "demo/**"
   pull_request:
   workflow_dispatch:
 
 permissions:
   contents: read
-
 jobs:
   quality-security-docker:
-    name: "Tests -> gates -> Docker -> Trivy -> smoke"
+    name: "Tests -> gates -> Docker API -> Trivy -> smoke"
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     permissions:
@@ -29,13 +29,11 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-
       - name: "02 - Python 3.12"
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
           check-latest: false
-
       - name: "03 - Prepare CI reports and provenance"
         shell: bash
         run: |
@@ -46,7 +44,6 @@ jobs:
           python --version > reports/ci/python_version.txt
           sha256sum data/digits.csv models/digits_baseline.joblib > reports/ci/input_sha256.txt
           sha256sum -c integrity/datasets.sha256
-
       - name: "04 - Install locked runtime and CI tools"
         shell: bash
         run: |
@@ -54,52 +51,44 @@ jobs:
           python -m pip install -r requirements-runtime.txt -r requirements-ci.txt
           python -m pip check
           python -m pip freeze > reports/ci/installed_packages.txt
-
       - name: "05 - Ruff lint (mandatory)"
         shell: bash
         run: |
           set -euo pipefail
-          ruff check src/ tests/ scripts/data_gate.py scripts/model_gate.py scripts/docker_smoke.py scripts/export_runtime_requirements.py scripts/security_gate.py --output-format json > reports/ci/ruff.json
+          ruff check src/ tests/ scripts/data_gate.py scripts/model_gate.py scripts/docker_smoke.py scripts/docker_api_smoke.py scripts/lab4_demo.py scripts/link_lab4_readme.py scripts/export_runtime_requirements.py scripts/security_gate.py --output-format json > reports/ci/ruff.json
           ruff --version > reports/ci/ruff_version.txt
-
       - name: "06 - Bandit security analysis (mandatory)"
         shell: bash
         run: |
           set -euo pipefail
           python -m bandit -r src/ -f json -o reports/ci/bandit.json
-
-      - name: "07 - Pytest unit and integration tests (mandatory)"
+      - name: "07 - Pytest unit and API integration tests (mandatory)"
         shell: bash
         run: |
           set -euo pipefail
           python -m pytest tests/ -q --junitxml=reports/ci/pytest.xml
-
       - name: "08 - pip-audit runtime dependencies (mandatory)"
         shell: bash
         run: |
           set -euo pipefail
           pip-audit -r requirements-runtime.txt --format json --output reports/ci/pip_audit_runtime.json
-
       - name: "09 - Data quality gate (mandatory)"
         shell: bash
         run: |
           set -euo pipefail
           python scripts/data_gate.py --report reports/ci/data_gate.json
-
       - name: "10 - Model quality gate (mandatory)"
         shell: bash
         run: |
           set -euo pipefail
           python scripts/model_gate.py --report reports/ci/model_gate.json
-
-      - name: "11 - Build offline non-root model image"
+      - name: "11 - Build non-root API image"
         shell: bash
         run: |
           set -euo pipefail
-          docker build --pull -t ml-project:lab3 . > reports/ci/docker_build.log 2>&1 || { cat reports/ci/docker_build.log; exit 1; }
-          docker image inspect ml-project:lab3 --format '{{json .Config.Healthcheck}}' > reports/ci/docker_healthcheck.json
-          docker image inspect ml-project:lab3 --format '{{.Id}}' > reports/ci/docker_image_id.txt
-
+          docker build --pull -t ml-project:lab4 . > reports/ci/docker_build.log 2>&1 || { cat reports/ci/docker_build.log; exit 1; }
+          docker image inspect ml-project:lab4 --format '{{json .Config.Healthcheck}}' > reports/ci/docker_healthcheck.json
+          docker image inspect ml-project:lab4 --format '{{.Id}}' > reports/ci/docker_image_id.txt
       - name: "12 - Install verified Trivy v0.76.1"
         shell: bash
         run: |
@@ -115,54 +104,86 @@ jobs:
           sudo dpkg -i trivy_0.76.1_Linux-64bit.deb
           cd "$GITHUB_WORKSPACE"
           trivy --version > reports/ci/trivy_version.txt
-
       - name: "13 - Real Trivy image scan (mandatory; errors block)"
         shell: bash
         run: |
           set -euo pipefail
-          trivy image --image-src docker --scanners vuln --format json --no-progress --output reports/ci/trivy_image.json ml-project:lab3
-
+          trivy image --image-src docker --scanners vuln --format json --no-progress --output reports/ci/trivy_image.json ml-project:lab4
       - name: "14 - Image security gate: CRITICAL/UNKNOWN (mandatory)"
         shell: bash
         run: |
           set -euo pipefail
           python scripts/security_gate.py --report reports/ci/trivy_image.json --output reports/ci/security_gate.json --exception-policy config/sqlite_exception_policy.json
-
       - name: "15 - Safe fixture security gate (mandatory, for failure demo)"
         shell: bash
         run: |
           set -euo pipefail
           python scripts/security_gate.py --report tests/fixtures/security_gate_input.json --output reports/ci/security_fixture_gate.json
-
       - name: "16 - Trivy Dockerfile configuration gate (mandatory)"
         shell: bash
         run: |
           set -euo pipefail
           trivy config --exit-code 1 --format json --output reports/ci/trivy_dockerfile.json Dockerfile
-
-      - name: "17 - Verify non-root and restricted offline prediction (mandatory)"
+      - name: "17 - Non-root and offline prediction smoke (mandatory)"
         shell: bash
         run: |
           set -euo pipefail
-          ACTUAL_UID=$(docker run --rm --entrypoint id ml-project:lab3 -u)
+          ACTUAL_UID=$(docker run --rm --entrypoint id ml-project:lab4 -u)
           echo "${ACTUAL_UID}" > reports/ci/container_uid.txt
           test "$ACTUAL_UID" = "10001"
-          docker run --rm --read-only --network none --cap-drop ALL --security-opt no-new-privileges --pids-limit 64 ml-project:lab3 | tee reports/ci/docker_smoke.txt
+          docker run --rm --read-only --network none --cap-drop ALL --security-opt no-new-privileges --pids-limit 64 --entrypoint python ml-project:lab4 -m scripts.docker_smoke | tee reports/ci/docker_smoke.txt
           grep -q 'SMOKE PASS:' reports/ci/docker_smoke.txt
-
-      - name: "18 - Record final run metadata (even after failure)"
+      - name: "18 - Launch API and smoke-test /health with ephemeral tokens"
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY' > "$RUNNER_TEMP/lab4_api.env"
+          import secrets
+          print('APP_API_TOKEN=' + secrets.token_hex(24))
+          print('APP_METRICS_TOKEN=' + secrets.token_hex(24))
+          PY
+          chmod 600 "$RUNNER_TEMP/lab4_api.env"
+          trap 'docker rm -f lab4-ci >/dev/null 2>&1 || true; rm -f "$RUNNER_TEMP/lab4_api.env"' EXIT
+          docker run -d --rm --name lab4-ci --read-only --tmpfs /tmp:rw,noexec,nosuid,size=16m --cap-drop ALL --security-opt no-new-privileges --pids-limit 64 --memory 700m -p 127.0.0.1:18000:8000 --env-file "$RUNNER_TEMP/lab4_api.env" ml-project:lab4 > reports/ci/container_id.txt
+          for retry in $(seq 1 25); do
+            if curl --fail --silent --max-time 3 http://127.0.0.1:18000/health > reports/ci/api_health.json; then break; fi
+            sleep 1
+          done
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          value=json.loads(Path('reports/ci/api_health.json').read_text())
+          assert value['status']=='healthy', value
+          print('HTTP HEALTH PASS:', value['model_version'])
+          PY
+          docker inspect lab4-ci --format '{{.State.Running}} {{.Config.User}}' > reports/ci/api_container_state.txt
+          grep -q '^true 10001:10001$' reports/ci/api_container_state.txt
+          python - <<'PY'
+          from pathlib import Path
+          import urllib.error
+          import urllib.request
+          lines = dict(line.split('=', 1) for line in Path(__import__('os').environ['RUNNER_TEMP'], 'lab4_api.env').read_text().splitlines())
+          req = urllib.request.Request('http://127.0.0.1:18000/metrics', headers={'X-Metrics-Token': lines['APP_METRICS_TOKEN']})
+          with urllib.request.urlopen(req, timeout=4) as r:
+              assert b'lab4_requests_total' in r.read()
+          req = urllib.request.Request('http://127.0.0.1:18000/predict', data=b'{"pixels":[0,0,5,13,9,1,0,0,0,0,13,15,10,15,5,0,0,3,15,2,0,11,8,0,0,4,12,0,0,8,8,0,0,5,8,0,0,9,8,0,0,4,11,0,1,12,7,0,0,2,14,5,10,12,0,0,0,0,6,13,10,0,0,0]}', headers={'Content-Type':'application/json', 'Authorization':'Bearer '+lines['APP_API_TOKEN']}, method='POST')
+          with urllib.request.urlopen(req, timeout=8) as r:
+              assert r.status == 200
+              print('HTTP PREDICT PASS:', r.status)
+          PY
+          docker rm -f lab4-ci >/dev/null
+      - name: "19 - Record final run metadata (even after failure)"
         if: always()
         shell: bash
         run: |
           mkdir -p reports/ci
           date -u +'%Y-%m-%dT%H:%M:%SZ' > reports/ci/scan_finished_utc.txt
           printf 'repository=%s\ncommit=%s\nref=%s\nrun_id=%s\n' "$GITHUB_REPOSITORY" "$GITHUB_SHA" "$GITHUB_REF" "$GITHUB_RUN_ID" > reports/ci/run_metadata.txt
-
-      - name: "19 - Upload all available diagnostic evidence (even after failure)"
+      - name: "20 - Upload all available diagnostic evidence (even after failure)"
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: "lab3-ci-evidence-${{ github.run_id }}"
+          name: "lab4-ci-evidence-${{ github.run_id }}"
           path: reports/ci/
           if-no-files-found: warn
           retention-days: 30

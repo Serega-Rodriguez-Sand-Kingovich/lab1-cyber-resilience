@@ -1,5 +1,6 @@
-# CI-only quality tools; runtime ML libraries are pinned separately.
+# CI tools from Lab 3, plus HTTP client for FastAPI TestClient.
 pytest==9.2.0
 ruff==0.17.3
 bandit==1.9.4
 pip-audit==2.10.1
+httpx==0.28.1

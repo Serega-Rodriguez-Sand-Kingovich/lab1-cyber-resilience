@@ -1,4 +1,4 @@
-# Allowlist: only build-required paths enter the Docker build context.
+# Explicit allowlist prevents uploading secrets or the whole project as build context.
 **
 !Dockerfile
 !requirements-runtime.txt
@@ -7,14 +7,20 @@
 !src/config.py
 !src/inference.py
 !src/data.py
+!src/webapp.py
+!static/
+!static/index.html
+!static/app.js
+!static/style.css
 !scripts/
 !scripts/docker_smoke.py
+!scripts/docker_api_smoke.py
 !models/
 !models/digits_baseline.joblib
 !metrics/
 !metrics/baseline.json
-
-# Defense in depth: secrets and caches are never context inputs.
+!integrity/
+!integrity/model.sha256
 .git
 .venv
 **/.env
