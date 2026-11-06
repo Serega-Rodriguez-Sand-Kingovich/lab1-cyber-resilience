@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Add a non-destructive Lab 1 / Lab 2 project index to the existing root README."""
-from pathlib import Path
 import shutil
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 README = ROOT / 'README.md'
