@@ -181,4 +181,4 @@ Workflow `.github/workflows/ci.yml` запускает старые этапы: 
 6. Подтверждение восстановления: `/detection` `alert=false`, успешное предсказание после истечения окна.
 7. Docker UID 10001, контейнерный `/health` и зелёный GitHub Actions с сохранёнными artifacts.
 
-См. пошаговую инструкцию `START_HERE_LAB4_RU.md` и каркас отчёта `LAB4_REPORT_TEMPLATE.md`. Для добавления ссылки на ЛР4 в основной README выполнить `python3 scripts/link_lab4_readme.py`.
+Для добавления ссылки на ЛР4 в основной README выполнить `python3 scripts/link_lab4_readme.py`.
