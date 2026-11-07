@@ -12,33 +12,45 @@
   <header>
     <p class="eyebrow">ИТМО · Киберустойчивость систем ИИ · ЛР №4</p>
     <h1>Распознавание рукописных цифр</h1>
-    <p class="lead">Модель из ЛР №2, защищённый API и проверка подозрительных запросов.</p>
-    <div class="pill-row"><span id="health" class="pill">Проверка сервиса…</span><span>Изображение 8 × 8 · значения 0–16</span></div>
+
+    <div class="pill-row"><span id="health" class="pill">Проверка сервиса…</span></div>
   </header>
   <div class="columns">
     <section class="panel">
-      <h2>1. Введите изображение</h2>
-      <p>Нажимайте на клетку для изменения интенсивности. Чёрный означает 0, цветной — 16. Или загрузите пример цифры 0.</p>
+      <h2>Изображение 8×8</h2>
+
       <div id="pixels" class="pixels" aria-label="Сетка цифры 8 на 8"></div>
       <div class="controls">
-        <button id="sample" type="button" class="secondary">Пример цифры 0</button>
+        <select id="sample" class="secondary" aria-label="Выбор цифры">
+
+          <option value="0">0</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+          <option value="9">9</option>
+        </select>
         <button id="clear" type="button" class="secondary">Очистить</button>
       </div>
-      <label for="token">API-токен (только для этого запроса)</label>
-      <input id="token" type="password" placeholder="Вставьте APP_API_TOKEN" autocomplete="off" spellcheck="false">
+      <label for="token">API-токен</label>
+      <input id="token" type="password" placeholder="Введите токен" autocomplete="off" spellcheck="false">
       <button id="send" type="button" class="primary">Распознать цифру</button>
     </section>
     <section class="panel results">
-      <h2>2. Результат</h2>
-      <p id="status" role="status" aria-live="polite">Введите токен, затем нажмите «Распознать цифру».</p>
+      <h2>Результат</h2>
+      <p id="status" role="status" aria-live="polite">Введите токен и нажмите кнопку.</p>
       <div class="prediction"><span class="muted">Предсказанная цифра</span><strong id="digit">—</strong></div>
       <dl><dt>Версия модели</dt><dd id="version">—</dd><dt>Идентификатор запроса</dt><dd id="request-id">—</dd></dl>
       <h3>Отображаемые значения</h3>
-      <p class="minor">Это исходные числовые признаки, а не обычная фотография. Изображение не загружается на внешний сервер.</p>
+      <p class="minor"> </p>
       <pre id="json-preview"></pre>
     </section>
   </div>
-  <footer>Локальная лабораторная демонстрация. Токен не сохраняется в браузере и не включается в адрес.</footer>
+  <footer> </footer>
 </main>
 </body>
 </html>
