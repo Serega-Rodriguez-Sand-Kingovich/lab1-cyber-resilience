@@ -30,6 +30,11 @@ function update() {
         if (pixels[r][c] > 16) pixels[r][c] = 0;
         update();
       });
+      cell.addEventListener("contextmenu", event => {
+        event.preventDefault();
+        pixels[r][c] = 0;
+        update();
+      });
       grid.append(cell);
     }
   }
@@ -54,16 +59,39 @@ async function checkHealth() {
   }
 }
 
-document.getElementById("sample").addEventListener("click", () => {
-  pixels = digitsZero.map(row => row.slice());
-  update();
-  setStatus("Пример цифры 0 загружен. Нажмите «Распознать цифру».");
+document.getElementById("sample").addEventListener("change", async (event) => {
+  const number = event.target.value;
+  if (number === "") return;
+
+  try {
+    const response = await fetch("/static/digit_examples.json");
+    if (!response.ok) throw new Error("Load failed");
+
+    const examples = await response.json();
+    const selected = examples[number];
+
+    if (!Array.isArray(selected) || selected.length !== 8 ||
+        !selected.every(row => Array.isArray(row) &&
+          row.length === 8 && row.every(v =>
+            Number.isInteger(v) && v >= 0 && v <= 16))) {
+      throw new Error("Invalid example");
+    }
+
+    pixels = selected.map(row => row.slice());
+    update();
+    digit.textContent = "—";
+    version.textContent = "—";
+    requestId.textContent = "—";
+    setStatus("");
+  } catch (_) {
+    setStatus("Не удалось загрузить пример.", true);
+  }
 });
 
 document.getElementById("clear").addEventListener("click", () => {
   pixels = Array.from({length: 8}, () => Array(8).fill(0));
   update();
-  setStatus("Поле очищено.");
+  setStatus("");
 });
 
 send.addEventListener("click", async () => {
@@ -73,7 +101,7 @@ send.addEventListener("click", async () => {
   version.textContent = "—";
   requestId.textContent = "—";
   if (!token) {
-    setStatus("Введите API-токен: без него сервер вернёт HTTP 401.", true);
+    setStatus("Введите токен.", true);
     return;
   }
   send.disabled = true;
@@ -101,7 +129,7 @@ send.addEventListener("click", async () => {
     }
     digit.textContent = String(data.prediction);
     version.textContent = String(data.model_version);
-    setStatus("Успешное предсказание.");
+    setStatus("");
   } catch (_) {
     setStatus("Сетевая ошибка: не удалось получить ответ от сервиса.", true);
   } finally {
@@ -111,3 +139,4 @@ send.addEventListener("click", async () => {
 
 update();
 checkHealth();
+document.getElementById("sample").dispatchEvent(new Event("change"));
